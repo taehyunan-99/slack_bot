@@ -26,6 +26,14 @@ def summarize_articles(keyword: str, articles: list[dict], api_key: str) -> str:
         model = genai.GenerativeModel("gemini-1.5-flash")
         prompt = build_prompt(keyword, articles)
         response = model.generate_content(prompt)
+        usage = response.usage_metadata
+        logger.info(
+            "Gemini 토큰 사용량 (keyword=%s): input=%d, output=%d, total=%d",
+            keyword,
+            usage.prompt_token_count,
+            usage.candidates_token_count,
+            usage.total_token_count,
+        )
         return response.text
     except Exception as e:
         logger.error("Gemini API 오류 (keyword=%s): %s", keyword, e)
