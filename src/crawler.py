@@ -1,5 +1,6 @@
 # src/crawler.py
 import logging
+import re
 import feedparser
 from urllib.parse import quote
 
@@ -11,9 +12,15 @@ def build_rss_url(query: str, lang: str = "ko", country: str = "KR") -> str:
     return f"https://news.google.com/rss/search?q={encoded}&hl={lang}&gl={country}&ceid={country}:{lang}"
 
 
-def _is_similar(title_a: str, title_b: str, threshold: float = 0.8) -> bool:
-    words_a = set(str(title_a).split())
-    words_b = set(str(title_b).split())
+def _tokenize(title: str) -> set:
+    # 특수문자 제거 후 2글자 이상 단어만 추출
+    cleaned = re.sub(r"[^\w\s]", " ", str(title))
+    return {w for w in cleaned.split() if len(w) >= 2}
+
+
+def _is_similar(title_a: str, title_b: str, threshold: float = 0.5) -> bool:
+    words_a = _tokenize(title_a)
+    words_b = _tokenize(title_b)
     if not words_a or not words_b:
         return False
     overlap = len(words_a & words_b) / min(len(words_a), len(words_b))
