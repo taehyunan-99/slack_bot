@@ -4,7 +4,6 @@ import os
 import yaml
 from dotenv import load_dotenv
 from src.crawler import fetch_news
-from src.summarizer import summarize_articles
 from src.slack_sender import format_keyword_block, send_to_slack
 
 load_dotenv()  # 로컬 .env 파일 로드 (GitHub Actions에서는 무시됨)
@@ -21,7 +20,7 @@ def load_config(config_path: str) -> dict:
         return yaml.safe_load(f)
 
 
-def run_pipeline(gemini_key: str, slack_webhook: str, config_path: str = "config/keywords.yaml") -> None:
+def run_pipeline(slack_webhook: str, config_path: str = "config/keywords.yaml") -> None:
     config = load_config(config_path)
     keywords = config["keywords"]
     count = config["settings"]["articles_per_keyword"]
@@ -33,9 +32,7 @@ def run_pipeline(gemini_key: str, slack_webhook: str, config_path: str = "config
         logger.info("크롤링 시작: %s", kw["name"])
         articles = fetch_news(kw["query"], count=count, lang=lang, country=country)
         logger.info("수집된 기사 수: %d (keyword=%s)", len(articles), kw["name"])
-
-        summary = summarize_articles(kw["name"], articles, api_key=gemini_key)
-        block = format_keyword_block(kw["name"], kw["emoji"], summary, articles)
+        block = format_keyword_block(kw["name"], kw["emoji"], articles)
         blocks.append(block)
 
     message = "\n\n".join(blocks)
@@ -48,6 +45,5 @@ def run_pipeline(gemini_key: str, slack_webhook: str, config_path: str = "config
 
 if __name__ == "__main__":
     run_pipeline(
-        gemini_key=os.environ["GEMINI_API_KEY"],
         slack_webhook=os.environ["SLACK_WEBHOOK_URL"],
     )

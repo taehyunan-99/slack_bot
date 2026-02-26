@@ -7,9 +7,9 @@ logger = logging.getLogger(__name__)
 KST = timezone(timedelta(hours=9))
 
 
-def format_keyword_block(keyword: str, emoji: str, summary: str, articles: list[dict]) -> str:
-    links = " | ".join([f"<{a['link']}|{a['title'][:20]}...>" for a in articles])
-    return f"{emoji} *{keyword} 뉴스* ({len(articles)}건)\n>{summary}\n🔗 {links}"
+def format_keyword_block(keyword: str, emoji: str, articles: list[dict]) -> str:
+    items = "\n".join([f"• <{a['link']}|{a['title']}>" for a in articles])
+    return f"{emoji} *{keyword} 뉴스* ({len(articles)}건)\n{items}"
 
 
 def send_to_slack(webhook_url: str, message: str) -> bool:

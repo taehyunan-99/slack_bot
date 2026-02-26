@@ -11,12 +11,11 @@ def test_format_keyword_block():
     block = format_keyword_block(
         keyword="AI",
         emoji="🤖",
-        summary="AI 분야 요약 내용",
         articles=articles
     )
     assert "AI" in block
     assert "🤖" in block
-    assert "AI 분야 요약 내용" in block
+    assert "AI 뉴스1" in block
     assert "https://example.com/1" in block
 
 def test_send_to_slack_success():
