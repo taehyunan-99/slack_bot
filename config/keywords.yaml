@@ -1,0 +1,15 @@
+keywords:
+  - name: "AI"
+    query: "AI OR 인공지능"
+    emoji: "🤖"
+  - name: "데이터 분석"
+    query: "데이터 분석 OR data analysis"
+    emoji: "📊"
+  - name: "머신러닝"
+    query: "머신러닝 OR machine learning"
+    emoji: "🧠"
+
+settings:
+  articles_per_keyword: 5
+  language: "ko"
+  country: "KR"
