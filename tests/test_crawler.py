@@ -3,6 +3,7 @@ import pytest
 from unittest.mock import patch, MagicMock
 from src.crawler import fetch_news, build_rss_url
 
+
 def test_build_rss_url():
     url = build_rss_url("AI", "ko", "KR")
     assert "news.google.com/rss/search" in url
