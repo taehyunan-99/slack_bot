@@ -7,17 +7,28 @@ logger = logging.getLogger(__name__)
 KST = timezone(timedelta(hours=9))
 
 
-def format_keyword_block(keyword: str, emoji: str, articles: list[dict]) -> str:
+def format_keyword_block(keyword: str, emoji: str, articles: list[dict]) -> list:
     items = "\n".join([f"• <{a['link']}|{a['title']}>" for a in articles])
-    return f"{emoji} *{keyword} 뉴스* ({len(articles)}건)\n{items}"
+    return [
+        {
+            "type": "section",
+            "text": {"type": "mrkdwn", "text": f"{emoji} *{keyword} 뉴스* ({len(articles)}건)\n{items}"},
+        },
+        {"type": "divider"},
+    ]
 
 
-def send_to_slack(webhook_url: str, message: str) -> bool:
+def send_to_slack(webhook_url: str, blocks: list) -> bool:
     today = datetime.now(tz=KST).strftime("%Y년 %m월 %d일")
-    full_message = f"*📰 오늘의 테크 뉴스 브리핑 - {today}*\n\n{message}"
+    header = [
+        {
+            "type": "header",
+            "text": {"type": "plain_text", "text": f"📰 오늘의 테크 뉴스 브리핑 - {today}"},
+        }
+    ]
     response = requests.post(
         webhook_url,
-        json={"text": full_message},
+        json={"blocks": header + blocks},
         headers={"Content-Type": "application/json"},
     )
     if response.status_code != 200:

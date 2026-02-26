@@ -1,15 +1,33 @@
 keywords:
-  - name: "AI"
-    query: "AI OR 인공지능"
+  # AI 분야
+  - name: "LLM"
+    query: "LLM OR 대형언어모델"
     emoji: "🤖"
-  - name: "데이터 분석"
-    query: "데이터 분석 OR data analysis"
-    emoji: "📊"
-  - name: "머신러닝"
-    query: "머신러닝 OR machine learning"
-    emoji: "🧠"
+  - name: "AI 에이전트"
+    query: "AI 에이전트 OR AI agent"
+    emoji: "🦾"
+  - name: "생성형 AI"
+    query: "생성형 AI OR Generative AI"
+    emoji: "✨"
+  - name: "AI 정책"
+    query: "AI 규제 OR AI 정책"
+    emoji: "⚖️"
+  - name: "오픈소스 AI"
+    query: "오픈소스 AI OR open source AI"
+    emoji: "🔓"
+
+  # 데이터 분야
+  - name: "데이터 엔지니어링"
+    query: "데이터 엔지니어링 OR data engineering"
+    emoji: "🔧"
+  - name: "RAG & 벡터DB"
+    query: "RAG OR 벡터 데이터베이스 OR vector database"
+    emoji: "🗄️"
+  - name: "데이터 분석 오픈소스"
+    query: "pandas OR polars OR duckdb OR 데이터 분석 오픈소스"
+    emoji: "🐼"
 
 settings:
-  articles_per_keyword: 5
+  articles_per_keyword: 3
   language: "ko"
   country: "KR"
