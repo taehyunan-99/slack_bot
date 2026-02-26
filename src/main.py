@@ -2,9 +2,12 @@
 import logging
 import os
 import yaml
+from dotenv import load_dotenv
 from src.crawler import fetch_news
 from src.summarizer import summarize_articles
 from src.slack_sender import format_keyword_block, send_to_slack
+
+load_dotenv()  # 로컬 .env 파일 로드 (GitHub Actions에서는 무시됨)
 
 logging.basicConfig(
     level=logging.INFO,
