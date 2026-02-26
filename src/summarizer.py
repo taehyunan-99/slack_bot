@@ -23,7 +23,7 @@ def summarize_articles(keyword: str, articles: list[dict], api_key: str) -> str:
         return "수집된 뉴스가 없습니다."
     try:
         genai.configure(api_key=api_key)
-        model = genai.GenerativeModel("gemini-2.5-flash")
+        model = genai.GenerativeModel("gemini-2.0-flash-lite")
         prompt = build_prompt(keyword, articles)
         response = model.generate_content(prompt)
         usage = response.usage_metadata
