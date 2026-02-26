@@ -1,6 +1,9 @@
 # src/crawler.py
+import logging
 import feedparser
 from urllib.parse import quote
+
+logger = logging.getLogger(__name__)
 
 
 def build_rss_url(query: str, lang: str = "ko", country: str = "KR") -> str:
@@ -12,6 +15,9 @@ def fetch_news(query: str, count: int = 5, lang: str = "ko", country: str = "KR"
     url = build_rss_url(query, lang, country)
     feed = feedparser.parse(url)
 
+    if feed.bozo:
+        logger.warning("RSS 피드 파싱 경고 (query=%s): %s", query, feed.bozo_exception)
+
     articles = []
     for entry in feed.entries[:count]:
         articles.append({
@@ -20,4 +26,8 @@ def fetch_news(query: str, count: int = 5, lang: str = "ko", country: str = "KR"
             "published": getattr(entry, "published", ""),
             "summary": getattr(entry, "summary", ""),
         })
+
+    if not articles:
+        logger.warning("수집된 기사 없음 (query=%s)", query)
+
     return articles

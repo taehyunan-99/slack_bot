@@ -1,5 +1,8 @@
 # src/summarizer.py
+import logging
 import google.generativeai as genai
+
+logger = logging.getLogger(__name__)
 
 
 def build_prompt(keyword: str, articles: list[dict]) -> str:
@@ -18,9 +21,12 @@ def build_prompt(keyword: str, articles: list[dict]) -> str:
 def summarize_articles(keyword: str, articles: list[dict], api_key: str) -> str:
     if not articles:
         return "수집된 뉴스가 없습니다."
-
-    genai.configure(api_key=api_key)
-    model = genai.GenerativeModel("gemini-1.5-flash")
-    prompt = build_prompt(keyword, articles)
-    response = model.generate_content(prompt)
-    return response.text
+    try:
+        genai.configure(api_key=api_key)
+        model = genai.GenerativeModel("gemini-1.5-flash")
+        prompt = build_prompt(keyword, articles)
+        response = model.generate_content(prompt)
+        return response.text
+    except Exception as e:
+        logger.error("Gemini API 오류 (keyword=%s): %s", keyword, e)
+        return f"요약 생성 실패: {e}"

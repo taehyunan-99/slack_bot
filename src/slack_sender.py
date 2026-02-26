@@ -1,6 +1,10 @@
 # src/slack_sender.py
+import logging
 import requests
-from datetime import datetime
+from datetime import datetime, timezone, timedelta
+
+logger = logging.getLogger(__name__)
+KST = timezone(timedelta(hours=9))
 
 
 def format_keyword_block(keyword: str, emoji: str, summary: str, articles: list[dict]) -> str:
@@ -9,12 +13,14 @@ def format_keyword_block(keyword: str, emoji: str, summary: str, articles: list[
 
 
 def send_to_slack(webhook_url: str, message: str) -> bool:
-    today = datetime.now().strftime("%Y년 %m월 %d일")
+    today = datetime.now(tz=KST).strftime("%Y년 %m월 %d일")
     full_message = f"*📰 오늘의 테크 뉴스 브리핑 - {today}*\n\n{message}"
-
     response = requests.post(
         webhook_url,
         json={"text": full_message},
         headers={"Content-Type": "application/json"},
     )
-    return response.status_code == 200
+    if response.status_code != 200:
+        logger.error("Slack 전송 실패: status=%d body=%s", response.status_code, response.text)
+        return False
+    return True

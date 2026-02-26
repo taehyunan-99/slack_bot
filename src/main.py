@@ -1,9 +1,16 @@
 # src/main.py
+import logging
 import os
 import yaml
 from src.crawler import fetch_news
 from src.summarizer import summarize_articles
 from src.slack_sender import format_keyword_block, send_to_slack
+
+logging.basicConfig(
+    level=logging.INFO,
+    format="%(asctime)s [%(levelname)s] %(name)s: %(message)s",
+)
+logger = logging.getLogger(__name__)
 
 
 def load_config(config_path: str) -> dict:
@@ -20,15 +27,20 @@ def run_pipeline(gemini_key: str, slack_webhook: str, config_path: str = "config
 
     blocks = []
     for kw in keywords:
+        logger.info("크롤링 시작: %s", kw["name"])
         articles = fetch_news(kw["query"], count=count, lang=lang, country=country)
+        logger.info("수집된 기사 수: %d (keyword=%s)", len(articles), kw["name"])
+
         summary = summarize_articles(kw["name"], articles, api_key=gemini_key)
         block = format_keyword_block(kw["name"], kw["emoji"], summary, articles)
         blocks.append(block)
 
     message = "\n\n".join(blocks)
+    logger.info("Slack 전송 중...")
     success = send_to_slack(slack_webhook, message)
     if not success:
         raise RuntimeError("Slack 전송 실패")
+    logger.info("완료")
 
 
 if __name__ == "__main__":
