@@ -24,13 +24,11 @@ def run_pipeline(slack_webhook: str, config_path: str = "config/keywords.yaml") 
     config = load_config(config_path)
     keywords = config["keywords"]
     count = config["settings"]["articles_per_keyword"]
-    lang = config["settings"]["language"]
-    country = config["settings"]["country"]
 
     blocks = []
     for kw in keywords:
         logger.info("크롤링 시작: %s", kw["name"])
-        articles = fetch_news(kw["query"], count=count, lang=lang, country=country)
+        articles = fetch_news(kw["query"], count=count, lang=kw["lang"], country=kw["country"])
         logger.info("수집된 기사 수: %d (keyword=%s)", len(articles), kw["name"])
         blocks.extend(format_keyword_block(kw["name"], kw["emoji"], articles))
     logger.info("Slack 전송 중...")
