@@ -2,12 +2,16 @@ name: Daily News Bot
 
 on:
   schedule:
-    - cron: "0 0 * * *"  # 매일 UTC 00:00 (KST 09:00) 실행
-  workflow_dispatch:  # 수동 실행
+    - cron: "15 23 * * *"  # 매일 UTC 23:15 (KST 08:15) 실행
+  workflow_dispatch:  # for manual testing
+
+permissions:
+  contents: read
 
 jobs:
   send-news:
     runs-on: ubuntu-latest
+    timeout-minutes: 10
 
     steps:
       - name: Checkout
@@ -17,6 +21,7 @@ jobs:
         uses: actions/setup-python@v5
         with:
           python-version: "3.11"
+          cache: "pip"
 
       - name: Install dependencies
         run: pip install -r requirements.txt
