@@ -1,13 +1,19 @@
 # src/crawler.py
 import logging
 import re
+from datetime import datetime, timedelta, timezone
 import feedparser
 from urllib.parse import quote
 
 logger = logging.getLogger(__name__)
 
+DEDUP_MULTIPLIER = 3  # 중복 제거 후 count개 확보를 위해 더 많이 수집
 
-def build_rss_url(query: str, lang: str = "ko", country: str = "KR") -> str:
+
+def build_rss_url(query: str, lang: str = "ko", country: str = "KR", days: int = 0) -> str:
+    if days > 0:
+        after_date = (datetime.now(timezone.utc) - timedelta(days=days)).strftime("%Y-%m-%d")
+        query = f"{query} after:{after_date}"
     encoded = quote(query)
     return f"https://news.google.com/rss/search?q={encoded}&hl={lang}&gl={country}&ceid={country}:{lang}"
 
@@ -35,15 +41,15 @@ def deduplicate(articles: list[dict]) -> list[dict]:
     return unique
 
 
-def fetch_news(query: str, count: int = 5, lang: str = "ko", country: str = "KR") -> list[dict]:
-    url = build_rss_url(query, lang, country)
+def fetch_news(query: str, count: int = 5, lang: str = "ko", country: str = "KR", days: int = 0) -> list[dict]:
+    url = build_rss_url(query, lang, country, days)
     feed = feedparser.parse(url)
 
     if feed.bozo:
         logger.warning("RSS 피드 파싱 경고 (query=%s): %s", query, feed.bozo_exception)
 
     articles = []
-    for entry in feed.entries[:count * 3]:  # 중복 제거 후 count개 확보를 위해 더 많이 수집
+    for entry in feed.entries[:count * DEDUP_MULTIPLIER]:
         articles.append({
             "title": getattr(entry, "title", "제목 없음"),
             "link": getattr(entry, "link", ""),

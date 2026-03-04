@@ -16,8 +16,13 @@ logger = logging.getLogger(__name__)
 
 
 def load_config(config_path: str) -> dict:
-    with open(config_path, "r", encoding="utf-8") as f:
-        return yaml.safe_load(f)
+    try:
+        with open(config_path, "r", encoding="utf-8") as f:
+            return yaml.safe_load(f)
+    except FileNotFoundError:
+        raise FileNotFoundError(f"설정 파일을 찾을 수 없음: {config_path}")
+    except yaml.YAMLError as e:
+        raise ValueError(f"YAML 파싱 실패 ({config_path}): {e}")
 
 
 def run_pipeline(slack_webhook: str, config_path: str = "config/keywords.yaml") -> None:
@@ -28,9 +33,10 @@ def run_pipeline(slack_webhook: str, config_path: str = "config/keywords.yaml") 
     blocks = []
     for kw in keywords:
         logger.info("크롤링 시작: %s", kw["name"])
-        articles = fetch_news(kw["query"], count=count, lang=kw["lang"], country=kw["country"])
+        articles = fetch_news(kw["query"], count=count, lang=kw["lang"], country=kw["country"], days=kw.get("days", 0))
         logger.info("수집된 기사 수: %d (keyword=%s)", len(articles), kw["name"])
-        blocks.extend(format_keyword_block(kw["name"], kw["emoji"], articles))
+        if articles:
+            blocks.extend(format_keyword_block(kw["name"], articles))
     logger.info("Slack 전송 중...")
     success = send_to_slack(slack_webhook, blocks)
     if not success:

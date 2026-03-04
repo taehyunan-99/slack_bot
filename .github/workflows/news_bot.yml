@@ -28,6 +28,5 @@ jobs:
 
       - name: Run news bot
         env:
-          GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
           SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
         run: python -m src.main
